@@ -40,16 +40,14 @@ export function formatDuration(startDate, endDate) {
   return `${hours} hr ${minutes} min`;
 }
 
-export function getTodayUTC() {
-  const now = new Date();
-  return new Date(Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate()
-  ))
-    .toISOString()
-    .split('T')[0]; // YYYY-MM-DD
-};
+export function getTodayLocal() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 export function formatMinutes(minutes) {
   if (minutes === null || minutes === undefined) return "-";

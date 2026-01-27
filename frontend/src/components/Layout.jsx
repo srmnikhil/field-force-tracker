@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-function Layout({ user, onLogout }) {
+function Layout() {
+  const { user, logout } = useAuth();
+
   const location = useLocation();
 
   const navItems =
@@ -53,7 +56,7 @@ function Layout({ user, onLogout }) {
               {user.name} ({user.role})
             </span>
             <button
-              onClick={onLogout}
+              onClick={logout}
               className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
             >
               Logout

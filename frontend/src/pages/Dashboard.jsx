@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import api from "../utils/api";
 import { formatLocalTime, parseUtcToLocal } from "../utils/date-helper";
+import { useAuth } from "../context/AuthContext";
 
-function Dashboard({ user }) {
+function Dashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -10,9 +12,6 @@ function Dashboard({ user }) {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-  useEffect(() => {
-  console.log("Dashboard mounted")
-}, [])
 
   const fetchDashboardData = async () => {
     try {

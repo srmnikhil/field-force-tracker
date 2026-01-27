@@ -5,7 +5,7 @@ import {
   getDistanceInMeters,
 } from "../utils/calculateDistance";
 
-function CheckIn({ user }) {
+function CheckIn() {
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
   const [notes, setNotes] = useState("");
@@ -78,7 +78,8 @@ function CheckIn({ user }) {
         setSuccess("Checked in successfully!");
         setSelectedClient("");
         setNotes("");
-        fetchData(); // Refresh data
+        fetchData();
+        getCurrentLocation();
       } else {
         setError(response.data.message);
       }
@@ -99,7 +100,8 @@ function CheckIn({ user }) {
 
       if (response.data.success) {
         setSuccess("Checked out successfully!");
-        setActiveCheckin(null);
+        fetchData();
+        getCurrentLocation();
       } else {
         setError(response.data.message);
       }
@@ -109,6 +111,11 @@ function CheckIn({ user }) {
       setSubmitting(false);
     }
   };
+
+  const selectedClientObj = useMemo(() => {
+    if (!selectedClient) return null;
+    return clients.find((c) => c.id === Number(selectedClient));
+  }, [clients, selectedClient]);
 
   const distanceMeters = useMemo(() => {
     if (!location) return null;
@@ -120,18 +127,15 @@ function CheckIn({ user }) {
     if (activeCheckin) {
       targetLat = activeCheckin.client_lat;
       targetLng = activeCheckin.client_lng;
-    } else if (selectedClient) {
-      const client = clients.find((c) => c.id === Number(selectedClient));
-      if (!client) return null;
-
-      targetLat = client.latitude;
-      targetLng = client.longitude;
+    } else if (selectedClientObj) {
+      targetLat = selectedClientObj.latitude;
+      targetLng = selectedClientObj.longitude;
     } else {
       return null;
     }
 
     return getDistanceInMeters(employeeLat, employeeLng, targetLat, targetLng);
-  }, [location, activeCheckin, selectedClient, clients]);
+  }, [location, activeCheckin, selectedClientObj]);
 
   if (loading) {
     return (

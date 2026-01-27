@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import api from "../utils/api";
-import { formatMinutes, getTodayUTC } from "../utils/date-helper";
+import { formatMinutes, getTodayLocal } from "../utils/date-helper";
+import { useAuth } from "../context/AuthContext";
 
-function Reports({ user }) {
-  const today = getTodayUTC();
-
+function Report() {
+  const today = getTodayLocal();
+  const { user } = useAuth();
   const [date, setDate] = useState(today);
   const [employeeId, setEmployeeId] = useState("");
   const [employees, setEmployees] = useState([]);
@@ -14,26 +15,26 @@ function Reports({ user }) {
 
   useEffect(() => {
     fetchTeam();
-    fetchReport(); // default load for today (all employees)
+    fetchReport(); // default load for today
   }, []);
 
   const fetchTeam = async () => {
-    const res = await api.get("/dashboard/stats");
-    if (res.data.success) {
-      setEmployees(res.data.data.team_members);
+    try {
+      const res = await api.get("/dashboard/stats");
+      if (res.data.success) {
+        setEmployees(res.data.data.team_members);
+      }
+    } catch {
+      // silent fail; page still works
     }
   };
-
   const fetchReport = async () => {
     try {
       let url = "/reports/daily-summary";
       const params = new URLSearchParams();
 
-      params.append("date", date); // date is required
-
-      if (employeeId) {
-        params.append("employee_id", employeeId);
-      }
+      params.append("date", date);
+      if (employeeId) params.append("employee_id", employeeId);
 
       if (params.toString()) {
         url += "?" + params.toString();
@@ -43,16 +44,28 @@ function Reports({ user }) {
       setError("");
 
       const response = await api.get(url);
+      console.log(response.data);
 
       if (response.data.success) {
         setReport(response.data.data);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load report");
     } finally {
       setLoading(false);
     }
   };
+  // Heavy formatting memoized
+  const rows = useMemo(() => {
+    if (!report) return [];
+    return report.employees.map((e) => ({
+      id: e.employee_id,
+      name: e.employee_name,
+      checkins: e.total_checkins,
+      time: formatMinutes(e.minutes_worked),
+      clients: e.clients_visited,
+    }));
+  }, [report]);
 
   if (!user || user.role !== "manager") {
     return (
@@ -146,14 +159,12 @@ function Reports({ user }) {
                 </tr>
               </thead>
               <tbody>
-                {report.employees.map((e) => (
-                  <tr key={e.employee_id} className="border-t">
-                    <td className="p-3">{e.employee_name}</td>
-                    <td className="p-3 text-center">{e.total_checkins}</td>
-                    <td className="p-3 text-center">
-                      {formatMinutes(e.minutes_worked)}
-                    </td>
-                    <td className="p-3 text-center">{e.clients_visited}</td>
+                {rows.map((row) => (
+                  <tr key={row.id} className="border-t">
+                    <td className="p-3">{row.name}</td>
+                    <td className="p-3 text-center">{row.checkins}</td>
+                    <td className="p-3 text-center">{row.time}</td>
+                    <td className="p-3 text-center">{row.clients}</td>
                   </tr>
                 ))}
               </tbody>
@@ -165,13 +176,13 @@ function Reports({ user }) {
   );
 }
 
-function Stat({ title, value }) {
+const Stat = React.memo(function Stat({ title, value }) {
   return (
     <div className="bg-white p-5 rounded-lg shadow">
       <p className="text-sm text-gray-500">{title}</p>
       <p className="text-2xl font-bold text-blue-600">{value}</p>
     </div>
   );
-}
+});
 
-export default Reports;
+export default Report;
