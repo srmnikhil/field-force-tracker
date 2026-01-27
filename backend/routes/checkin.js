@@ -24,7 +24,7 @@ router.get('/clients', authenticateToken, async (req, res) => {
 // Create new check-in
 router.post('/', authenticateToken, async (req, res) => {
     try {
-        const { client_id, latitude, longitude, notes } = req.body;
+        const { client_id, latitude, longitude, distance_from_client, notes } = req.body;
 
         if (!client_id) {
             return res.status(200).json({ success: false, message: 'Client ID is required' });
@@ -42,21 +42,21 @@ router.post('/', authenticateToken, async (req, res) => {
 
         // Check for existing active check-in
         const [activeCheckins] = await pool.execute(
-            'SELECT * FROM checkins WHERE employee_id = ? AND status = "checked_in"',
+            "SELECT * FROM checkins WHERE employee_id = ? AND status = 'checked_in'",
             [req.user.id]
         );
 
         if (activeCheckins.length > 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'You already have an active check-in. Please checkout first.' 
+            return res.status(400).json({
+                success: false,
+                message: 'You already have an active check-in. Please checkout first.'
             });
         }
 
         const [result] = await pool.execute(
-            `INSERT INTO checkins (employee_id, client_id, lat, lng, notes, status)
-             VALUES (?, ?, ?, ?, ?, 'checked_in')`,
-            [req.user.id, client_id, latitude, longitude, notes || null]
+            `INSERT INTO checkins (employee_id, client_id, latitude, longitude, distance_from_client, notes, status)
+             VALUES (?, ?, ?, ?, ?, ?, 'checked_in')`,
+            [req.user.id, client_id, latitude, longitude, distance_from_client, notes || null]
         );
 
         res.status(201).json({
@@ -85,7 +85,7 @@ router.put('/checkout', authenticateToken, async (req, res) => {
         }
 
         await pool.execute(
-            'UPDATE checkins SET checkout_time = NOW(), status = "checked_out" WHERE id = ?',
+            "UPDATE checkins SET checkout_time = datetime('now'), status = 'checked_out' WHERE id = ?",
             [activeCheckins[0].id]
         );
 
@@ -100,7 +100,7 @@ router.put('/checkout', authenticateToken, async (req, res) => {
 router.get('/history', authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date } = req.query;
-        
+
         let query = `
             SELECT ch.*, c.name as client_name, c.address as client_address
             FROM checkins ch
@@ -131,17 +131,23 @@ router.get('/history', authenticateToken, async (req, res) => {
 router.get('/active', authenticateToken, async (req, res) => {
     try {
         const [checkins] = await pool.execute(
-            `SELECT ch.*, c.name as client_name 
-             FROM checkins ch
-             INNER JOIN clients c ON ch.client_id = c.id
-             WHERE ch.employee_id = ? AND ch.status = 'checked_in'
-             ORDER BY ch.checkin_time DESC LIMIT 1`,
+            `SELECT 
+            ch.*,
+            c.name AS client_name,
+            c.latitude  AS client_lat,
+            c.longitude  AS client_lng
+            FROM checkins ch
+            INNER JOIN clients c ON ch.client_id = c.id
+            WHERE ch.employee_id = ? 
+                AND ch.status = 'checked_in'
+            ORDER BY ch.checkin_time DESC
+            LIMIT 1`,
             [req.user.id]
         );
 
-        res.json({ 
-            success: true, 
-            data: checkins.length > 0 ? checkins[0] : null 
+        res.json({
+            success: true,
+            data: checkins.length > 0 ? checkins[0] : null
         });
     } catch (error) {
         console.error('Active checkin error:', error);
