@@ -50,3 +50,24 @@ export function getTodayUTC() {
     .toISOString()
     .split('T')[0]; // YYYY-MM-DD
 };
+
+export function formatMinutes(minutes) {
+  if (minutes === null || minutes === undefined) return "-";
+
+  const totalMinutes = Math.floor(minutes);
+
+  if (totalMinutes <= 0) return "0 min";
+
+  const hrs = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  if (hrs === 0) {
+    return `${mins} min`;
+  }
+
+  if (mins === 0) {
+    return `${hrs} hr`;
+  }
+
+  return `${hrs} hr ${mins} min`;
+}

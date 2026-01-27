@@ -10,11 +10,15 @@ function Dashboard({ user }) {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+  useEffect(() => {
+  console.log("Dashboard mounted")
+}, [])
 
   const fetchDashboardData = async () => {
     try {
       const endpoint =
-        user.id === 1 ? "/dashboard/stats" : "/dashboard/employee";
+        user.role === "manager" ? "/dashboard/stats" : "/dashboard/employee";
+
       const response = await api.get(endpoint);
 
       if (response.data.success) {
@@ -93,9 +97,7 @@ function Dashboard({ user }) {
                       <tr key={checkin.id} className="border-t">
                         <td className="py-3">{checkin.employee_name}</td>
                         <td className="py-3">{checkin.client_name}</td>
-                        <td className="py-3">
-                          {formatLocalTime(checkInTime)}
-                        </td>
+                        <td className="py-3">{formatLocalTime(checkInTime)}</td>
                         <td className="py-3">
                           <span
                             className={`px-2 py-1 rounded text-xs ${

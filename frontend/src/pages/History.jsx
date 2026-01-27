@@ -19,7 +19,6 @@ function History({ user }) {
   useEffect(() => {
     fetchHistory();
   }, []);
-
   const fetchHistory = async () => {
     try {
       let url = "/checkin/history";
@@ -141,7 +140,6 @@ function History({ user }) {
               if (!hadFullFilter) return;
 
               // Fetch unfiltered history
-              setLoading(true);
               setLoading(true);
               api
                 .get("/checkin/history")

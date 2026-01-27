@@ -18,15 +18,21 @@ api.interceptors.request.use((config) => {
 
 // Handle auth errors
 api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+
+    if ((status === 401 || status === 403) &&
+        window.location.pathname !== '/login') {
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
+
+    return Promise.reject(error);
+  }
 );
+
 
 export default api;
