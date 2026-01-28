@@ -224,7 +224,7 @@ In the Field Force Tracker, the check-in flow has a classic race scenario:
 
 **Result:** The employee ends up with **two active check-ins**, violating the business rule that only one active check-in should exist at a time.
 
-This kind of issue arises from concurrent access to shared state (the employee’s check-in status) without proper synchronization or protection. :contentReference[oaicite:1]{index=1}
+This kind of issue arises from concurrent access to shared state (the employee’s check-in status) without proper synchronization or protection.
 
 Possible real-world triggers include:
 
