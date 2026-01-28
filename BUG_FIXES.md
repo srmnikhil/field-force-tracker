@@ -26,10 +26,14 @@ This caused:
 - Logins to succeed even with wrong passwords
 - Authentication to be unreliable
 
+---
+
 ### How I verified it
 
 I attempted to log in with an incorrect password.
 Instead of showing “Invalid credentials”, it redirected me to directly on Dashboard.
+
+---
 
 ### How it was fixed
 
@@ -38,6 +42,8 @@ The Promise is now awaited:
 ```js
 const isValidPassword = await bcrypt.compare(password, user.password);
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -82,6 +88,10 @@ This included the bcrypt password hash inside the token payload.
 JWTs are Base64-encoded, not encrypted.
 Anyone who receives the token can decode it.
 
+---
+
+### How I verified it
+
 I verified this by copying the token returned by /login and pasting it into https://jwt.io
 , which revealed the password hash in the payload.
 
@@ -99,6 +109,8 @@ This exposed:
 }
 ```
 
+---
+
 ### How it was fixed
 
 The password field was removed from the JWT payload:
@@ -110,6 +122,8 @@ jwt.sign(
   { expiresIn: "24h" },
 );
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -162,12 +176,14 @@ When a user entered a wrong email or password:
 - The user never saw why login failed
 - This made it appear like the login form was broken or refreshing randomly.
 
+---
+
 ### How I verified it
 
 I attempted to log in with an incorrect password.
 Instead of showing “Invalid credentials”, the page instantly refreshed and stayed on /login with no error message.
 
-This confirmed the interceptor was hijacking authentication errors.
+## This confirmed the interceptor was hijacking authentication errors.
 
 ### How it was fixed
 
@@ -192,6 +208,8 @@ api.interceptors.response.use(
   },
 );
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -271,6 +289,8 @@ return res
   .json({ success: false, message: "Invalid or expired token" });
 ```
 
+---
+
 ### Why this fix is correct
 
 The correct HTTP status codes now accurately reflect the nature of the errors, allowing the frontend to handle them appropriately.
@@ -289,6 +309,8 @@ The correct HTTP status codes now accurately reflect the nature of the errors, a
 ```js
 const endpoint = user.id === 1 ? "/dashboard/stats" : "/dashboard/employee";
 ```
+
+---
 
 ### What was wrong
 
@@ -309,6 +331,8 @@ Because of this:
 - Some employees could be sent to the manager dashboard API
 - Users saw incorrect or unauthorized dashboard data
 
+---
+
 ### How it was fixed
 
 The logic was changed to use the user’s role instead of a hard-coded ID:
@@ -317,6 +341,8 @@ The logic was changed to use the user’s role instead of a hard-coded ID:
 const endpoint =
   user.role === "manager" ? "/dashboard/stats" : "/dashboard/employee";
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -433,6 +459,8 @@ This bypasses the date filter and returns all check-ins, including data outside 
 I personally verified this by sending that payload using Thunder Client and received the entire check-ins table in the response.
 This is a critical security issue because it allows data leakage using only a crafted URL.
 
+---
+
 ### How it was fixed
 
 The query was rewritten to use parameterized placeholders instead of string interpolation.
@@ -448,6 +476,8 @@ if (end_date) {
   params.push(end_date);
 }
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -615,7 +645,7 @@ Later in the component, the code attempted to call .reduce() on checkins:
 const totalHours = checkins.reduce(...)
 ```
 
-On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
+## On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
 
 ### How it was fixed
 
@@ -666,7 +696,7 @@ Initializing the state as an empty array allows the component to safely perform 
 
 **Line:** ~162 (checkin time display) and ~164 (checkout time display) `starter-code/frontend/src/pages/History.jsx`
 
-**Line:** ~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
+## **Line:** ~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
 
 ### What was wrong
 
@@ -681,6 +711,8 @@ The time values were stored in UTC but without any timezone marker, for example:
 
 Because this format does not include timezone information, JavaScript interpreted it as the user’s local time instead of UTC.
 This caused all displayed times to be incorrect by the user’s timezone offset (for example, 5.5 hours in India).
+
+---
 
 ### How it was fixed
 
@@ -713,6 +745,8 @@ export function formatLocalTime(date) {
   });
 }
 ```
+
+---
 
 ### Why this fix is correct
 
@@ -773,6 +807,8 @@ if (!hadFullFilter) return;
 
 api.get("/checkin/history").then(...)
 ```
+
+---
 
 ### Why this fix is correct
 
