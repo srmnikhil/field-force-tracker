@@ -202,8 +202,6 @@ Authorization decides what an authenticated user can access or perform within th
 | Happens first                                     | Happens after authentication                                      |
 | Relies on credentials (password, OTP, biometrics) | Relies on roles, access levels, or privileges                     |
 | Verifies if the user is valid                     | Determines what the valid user can do                             |
-| Uses ID tokens                                    | Uses access tokens                                                |
-| Managed under protocols like OpenID Connect       | Managed under protocols like OAuth 2.0                            |
 | User can change credentials                       | Permissions are controlled by the system                          |
 | Visible to the user (e.g., login screen)          | Not visible to the user                                           |
 | Examples: Passwords, OTPs, fingerprints           | Examples: Admin rights, read/write access, role-based permissions |

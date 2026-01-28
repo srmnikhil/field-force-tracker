@@ -29,15 +29,17 @@ If `employee_id` is not provided, the report includes **all employees under the 
 
 **Team-wide daily summary**
 
-`GET /api/reports/daily-summary?date=2024-01-15`
+`GET /api/reports/daily-summary?date=2026-01-27`
 
 **Single employee daily summary**
 
-`GET /api/reports/daily-summary?date=2024-01-15&employee_id=3`
+`GET /api/reports/daily-summary?date=2026-01-27&employee_id=2`
 
 ---
 
 ### Successful Response (With Data)
+
+#### Without employee_id
 
 ```json
 {
@@ -77,7 +79,33 @@ If `employee_id` is not provided, the report includes **all employees under the 
 }
 ```
 
-Successful Response (No Check-ins for the Date)
+#### With employee_id
+
+```json
+{
+  "success": true,
+  "data": {
+    "date": "2026-01-27",
+    "employees": [
+      {
+        "employee_id": 2,
+        "employee_name": "Rahul Kumar",
+        "total_checkins": 3,
+        "clients_visited": 1,
+        "minutes_worked": 186.25
+      }
+    ],
+    "team_stats": {
+      "total_employees": 1,
+      "total_checkins": 3,
+      "total_minutes": 186.25,
+      "total_clients": 1
+    }
+  }
+}
+```
+
+### Successful Response (No Check-ins for the Date)
 
 When employees exist but no one checked in on the given date, the API still returns a valid response with zeroed metrics.
 
