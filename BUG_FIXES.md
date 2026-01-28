@@ -183,7 +183,7 @@ When a user entered a wrong email or password:
 I attempted to log in with an incorrect password.
 Instead of showing “Invalid credentials”, the page instantly refreshed and stayed on /login with no error message.
 
-## This confirmed the interceptor was hijacking authentication errors.
+### This confirmed the interceptor was hijacking authentication errors.
 
 ### How it was fixed
 
@@ -645,7 +645,7 @@ Later in the component, the code attempted to call .reduce() on checkins:
 const totalHours = checkins.reduce(...)
 ```
 
-## On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
+### On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
 
 ### How it was fixed
 
@@ -695,8 +695,7 @@ Initializing the state as an empty array allows the component to safely perform 
 - `starter-code/frontend/src/pages/Dashboard.jsx`
 
 **Line:** ~162 (checkin time display) and ~164 (checkout time display) `starter-code/frontend/src/pages/History.jsx`
-
-## **Line:** ~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
+**Line:** ~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
 
 ### What was wrong
 
