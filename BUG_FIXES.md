@@ -144,6 +144,8 @@ Removing the password prevents:
 
 **File:** `starter-code/frontend/src/utils/api.js`
 
+**Line:** ~20-30
+
 ---
 
 ### What was wrong
@@ -183,7 +185,9 @@ When a user entered a wrong email or password:
 I attempted to log in with an incorrect password.
 Instead of showing “Invalid credentials”, the page instantly refreshed and stayed on /login with no error message.
 
-### This confirmed the interceptor was hijacking authentication errors.
+This confirmed the interceptor was hijacking authentication errors.
+
+---
 
 ### How it was fixed
 
@@ -541,8 +545,7 @@ Calling e.preventDefault() stops the page from reloading and ensures the API cal
 
 **File:** `starter-code/backend/routes/checkin.js`
 
-**Line:**  
-~88 (checkout update query)
+**Line:** ~88 (checkout update query)
 
 ---
 
@@ -645,7 +648,9 @@ Later in the component, the code attempted to call .reduce() on checkins:
 const totalHours = checkins.reduce(...)
 ```
 
-### On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
+On the first render, before the API response arrived, checkins was still null, causing the page to crash because null does not have a reduce method.
+
+---
 
 ### How it was fixed
 
@@ -694,8 +699,11 @@ Initializing the state as an empty array allows the component to safely perform 
 - `starter-code/frontend/src/pages/History.jsx`
 - `starter-code/frontend/src/pages/Dashboard.jsx`
 
-**Line:** ~162 (checkin time display) and ~164 (checkout time display) `starter-code/frontend/src/pages/History.jsx`
-**Line:** ~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
+**Line:**
+~162 (checkin time display) and ~164 (checkout time display) `starter-code/frontend/src/pages/History.jsx`
+~60 (checkin time display) `starter-code/frontend/src/pages/Dashboard.jsx`
+
+---
 
 ### What was wrong
 
